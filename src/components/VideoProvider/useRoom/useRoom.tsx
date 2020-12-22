@@ -7,6 +7,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 // @ts-ignore
 window.TwilioVideo = Video;
 
+
+export const DEFAULT_VIDEO_CONSTRAINTS = {
+  width: 1920,
+  height: 1080,
+  frameRate: 25,
+}
+
 export default function useRoom(localTracks: LocalTrack[], onError: Callback, options?: ConnectOptions) {
   const [room, setRoom] = useState<Room>(new EventEmitter() as Room);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -21,7 +28,10 @@ export default function useRoom(localTracks: LocalTrack[], onError: Callback, op
   const connect = useCallback(
     token => {
       setIsConnecting(true);
-      return Video.connect(token, { ...optionsRef.current, tracks: localTracks }).then(
+      return Video.connect(token, { ...optionsRef.current,
+        preferredVideoCodecs: ["H264"],
+        video: DEFAULT_VIDEO_CONSTRAINTS,
+        },tracks: localTracks }).then(
         newRoom => {
           setRoom(newRoom);
           const disconnect = () => newRoom.disconnect();
